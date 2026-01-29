@@ -57,44 +57,50 @@ class AgentsTab(BaseTab):
     DEFAULT_CSS = """
     AgentsTab {
         layout: vertical;
+        background: #0f0f0f;
     }
     
     AgentsTab .section-header {
-        background: $panel;
-        color: $accent;
+        background: linear-gradient(90deg, #1a0000 0%, #8b0000 50%, #1a0000 100%);
+        color: #ffffff;
         text-style: bold;
-        padding: 0 1;
-        height: 1;
-        border-bottom: solid $primary;
+        padding: 0 2;
+        height: 3;
+        border: round #ff0000;
+        content-align: center middle;
     }
     
     AgentsTab .toolbar {
-        height: 3;
-        padding: 1;
-        background: $panel;
-        border-bottom: solid $primary;
+        height: 4;
+        padding: 1 2;
+        background: linear-gradient(135deg, #151515 0%, #1a0a0a 100%);
+        border: solid #ff3333;
+        margin-bottom: 1;
     }
     
     AgentsTab .stats-bar {
         height: 3;
-        background: $panel;
+        background: linear-gradient(90deg, #0a0a0a 0%, #151515 50%, #0a0a0a 100%);
         padding: 0 2;
-        border-bottom: solid $primary;
+        border: solid #5b0000;
+        margin: 1 0;
     }
     
     AgentsTab #agents-table {
         height: 2fr;
         min-height: 10;
-        border: solid $primary;
+        border: heavy #ff0000;
+        background: #0f0f0f;
     }
     
     AgentsTab #agent-details-container {
         height: 1fr;
         min-height: 10;
         max-height: 25;
-        background: $panel;
-        border: solid $accent;
+        background: linear-gradient(135deg, #151515 0%, #1a0a0a 100%);
+        border: round #ff3333;
         margin: 1;
+        padding: 1;
     }
     
     AgentsTab .agent-details {
@@ -126,35 +132,37 @@ class AgentsTab(BaseTab):
         self.selected_agent: Any = None
 
     def compose(self) -> ComposeResult:
-        """Compose the agents layout."""
-        # Logo - displayed only in Agents tab
-        yield HackAgentHeader()
-
-        # Title section
+        """Compose the agents layout with enhanced visuals."""
+        # Title section with gradient border
         yield Static(
-            "🤖 [bold cyan]Agent Management[/bold cyan]", classes="section-header"
+            "╔═══════════════════════════════════════════════════════════════╗\n"
+            "║      🤖 [bold cyan reverse] AGENT MANAGEMENT CENTER [/]      ║\n"
+            "╚═══════════════════════════════════════════════════════════════╝",
+            classes="section-header",
         )
 
-        # Statistics bar
+        # Statistics bar with enhanced formatting
         yield Static(
-            "📊 [cyan]Total Agents:[/cyan] [yellow]0[/yellow] | "
-            "🟢 [green]Active:[/green] [yellow]0[/yellow] | "
-            "⚡ [magenta]Last Updated:[/magenta] [dim]Never[/dim]",
+            "┌─────────────────────────────────────────────────────────────┐\n"
+            "│ 📊 [cyan]Total:[/cyan] [bold yellow]0[/bold yellow] │ "
+            "🟢 [green]Active:[/green] [bold yellow]0[/bold yellow] │ "
+            "⚡ [magenta]Updated:[/magenta] [dim]Never[/dim]       │\n"
+            "└─────────────────────────────────────────────────────────────┘",
             id="agents-stats",
             classes="stats-bar",
         )
 
-        # Toolbar with action buttons
+        # Toolbar with action buttons and enhanced styling
         with Horizontal(classes="toolbar"):
-            yield Button("🔄 Refresh", id="refresh-agents", variant="primary")
-            yield Button("➕ New Agent", id="new-agent", variant="success")
-            yield Button("🗑️  Delete", id="delete-agent", variant="error")
+            yield Button("🔄 Refresh Data", id="refresh-agents", variant="primary")
+            yield Button("➕ Create Agent", id="new-agent", variant="success")
+            yield Button("🗑️ Delete Agent", id="delete-agent", variant="error")
 
-        # Agents table
+        # Agents table with enhanced borders
         table: DataTable = DataTable(
             id="agents-table", zebra_stripes=True, cursor_type="row"
         )
-        table.add_columns("ID", "Name", "Type", "Endpoint", "Status", "Created")
+        table.add_columns("🆔 ID", "📛 Name", "🤖 Type", "🌐 Endpoint", "⚡ Status", "📅 Created")
         yield table
 
         # Details panel
@@ -169,13 +177,19 @@ class AgentsTab(BaseTab):
         # Show loading message immediately
         try:
             details_widget = self.query_one("#agent-details", Static)
-            details_widget.update("⏳ [cyan]Loading agents from API...[/cyan]")
+            details_widget.update(
+                "┌───────────────────────────────────────┐\n"
+                "│ ⏳ [cyan]Loading agents from API...[/cyan]  │\n"
+                "└───────────────────────────────────────┘"
+            )
 
             stats_widget = self.query_one("#agents-stats", Static)
             stats_widget.update(
-                "📊 [cyan]Total Agents:[/cyan] [yellow]...[/yellow] | "
-                "🟢 [green]Active:[/green] [yellow]...[/yellow] | "
-                "⚡ [magenta]Status:[/magenta] [cyan]Loading...[/cyan]"
+                "┌─────────────────────────────────────────────────────────────┐\n"
+                "│ 📊 [cyan]Total:[/cyan] [bold yellow]...[/bold yellow] │ "
+                "🟢 [green]Active:[/green] [bold yellow]...[/bold yellow] │ "
+                "⚡ [magenta]Status:[/magenta] [cyan]Loading...[/cyan]  │\n"
+                "└─────────────────────────────────────────────────────────────┘"
             )
         except Exception:
             pass
@@ -205,9 +219,11 @@ class AgentsTab(BaseTab):
         try:
             stats_widget = self.query_one("#agents-stats", Static)
             stats_widget.update(
-                "📊 [cyan]Total Agents:[/cyan] [yellow]...[/yellow] | "
-                "🟢 [green]Active:[/green] [yellow]...[/yellow] | "
-                "⚡ [magenta]Status:[/magenta] [cyan]Refreshing...[/cyan]"
+                "┌─────────────────────────────────────────────────────────────┐\n"
+                "│ 📊 [cyan]Total:[/cyan] [bold yellow]...[/bold yellow] │ "
+                "🟢 [green]Active:[/green] [bold yellow]...[/bold yellow] │ "
+                "⚡ [magenta]Status:[/magenta] [cyan]Refreshing...[/cyan] │\n"
+                "└─────────────────────────────────────────────────────────────┘"
             )
         except Exception:
             pass
@@ -231,11 +247,16 @@ class AgentsTab(BaseTab):
             # Validate configuration
             if not self.cli_config.api_key:
                 self._show_empty_state(
-                    "🔑 [bold yellow]API Key Not Configured[/bold yellow]\n\n"
-                    "[cyan]To get started:[/cyan]\n"
-                    "1. Run: [bold]hackagent config set --api-key YOUR_KEY[/bold]\n"
-                    "2. Press [bold]F5[/bold] to refresh\n\n"
-                    "[dim]Need an API key? Visit the HackAgent dashboard[/dim]"
+                    "┌─────────────────────────────────────────────┐\n"
+                    "│ 🔑 [bold yellow]API KEY NOT CONFIGURED[/bold yellow]      │\n"
+                    "│                                             │\n"
+                    "│ [cyan]To get started:[/cyan]                        │\n"
+                    "│ [dim]1. Run: hackagent config set[/dim]          │\n"
+                    "│ [dim]2. Press F5 to refresh[/dim]                │\n"
+                    "│                                             │\n"
+                    "│ [green]Get your API key at:[/green]                │\n"
+                    "│ [blue]https://app.hackagent.dev[/blue]            │\n"
+                    "└─────────────────────────────────────────────┘"
                 )
                 return
 
@@ -256,21 +277,28 @@ class AgentsTab(BaseTab):
                     table = self.query_one("#agents-table", DataTable)
                     table.clear()
 
-                    # Update stats
+                    # Update stats with enhanced box format
                     stats_widget = self.query_one("#agents-stats", Static)
                     stats_widget.update(
-                        "📊 [cyan]Total Agents:[/cyan] [yellow]0[/yellow] | "
-                        "🟢 [green]Active:[/green] [yellow]0[/yellow] | "
-                        "⚡ [magenta]Status:[/magenta] [green]Loaded[/green]"
+                        "┌─────────────────────────────────────────────────────────────┐\n"
+                        "│ 📊 [cyan]Total:[/cyan] [bold yellow]0[/bold yellow] │ "
+                        "🟢 [green]Active:[/green] [bold yellow]0[/bold yellow] │ "
+                        "⚡ [magenta]Status:[/magenta] [green]Loaded ✓[/green]      │\n"
+                        "└─────────────────────────────────────────────────────────────┘"
                     )
 
                     details_widget = self.query_one("#agent-details", Static)
                     details_widget.update(
-                        "📭 [bold cyan]No Agents Found[/bold cyan]\n\n"
-                        "[yellow]Get started by creating your first agent:[/yellow]\n\n"
-                        "• Click [bold]➕ New Agent[/bold] button above\n"
-                        "• Or use the CLI: [bold]hackagent agent create[/bold]\n\n"
-                        "[dim]Agents are AI systems that you can test for security vulnerabilities[/dim]"
+                        "┌───────────────────────────────────────────────┐\n"
+                        "│ 📭 [bold cyan]NO AGENTS FOUND[/bold cyan]                │\n"
+                        "│                                               │\n"
+                        "│ [yellow]Get started by creating an agent:[/yellow]     │\n"
+                        "│                                               │\n"
+                        "│ [dim]• Click [/dim][bold]➕ Create Agent[/bold][dim] above[/dim]     │\n"
+                        "│ [dim]• Or use CLI: hackagent agent create[/dim]   │\n"
+                        "│                                               │\n"
+                        "│ [green]Ready to secure your AI agents! ⚡[/green]     │\n"
+                        "└───────────────────────────────────────────────┘"
                     )
                 else:
                     self._update_table()
@@ -302,13 +330,15 @@ class AgentsTab(BaseTab):
         table = self.query_one("#agents-table", DataTable)
         table.clear()
 
-        # Update stats bar
+        # Update stats bar with enhanced box format
         try:
             stats_widget = self.query_one("#agents-stats", Static)
             stats_widget.update(
-                "📊 [cyan]Total Agents:[/cyan] [red]0[/red] | "
-                "🟢 [green]Active:[/green] [red]0[/red] | "
-                "⚡ [magenta]Status:[/magenta] [red]Error[/red]"
+                "┌─────────────────────────────────────────────────────────────┐\n"
+                "│ 📊 [cyan]Total:[/cyan] [bold red]0[/bold red] │ "
+                "🟢 [green]Active:[/green] [bold red]0[/bold red] │ "
+                "⚡ [magenta]Status:[/magenta] [red]Error ✗[/red]      │\n"
+                "└─────────────────────────────────────────────────────────────┘"
             )
         except Exception:
             pass
@@ -390,27 +420,33 @@ class AgentsTab(BaseTab):
                 )
                 rows_added += 1
 
-            # Update statistics bar
+            # Update statistics bar with enhanced box format
             from datetime import datetime as dt
 
             current_time = dt.now().strftime("%H:%M:%S")
 
             stats_widget = self.query_one("#agents-stats", Static)
             stats_widget.update(
-                f"📊 [cyan]Total Agents:[/cyan] [green]{rows_added}[/green] | "
-                f"🟢 [green]Active:[/green] [green]{active_count}[/green] | "
-                f"⚡ [magenta]Last Updated:[/magenta] [yellow]{current_time}[/yellow]"
+                "┌─────────────────────────────────────────────────────────────┐\n"
+                f"│ 📊 [cyan]Total:[/cyan] [bold green]{rows_added}[/bold green] │ "
+                f"🟢 [green]Active:[/green] [bold green]{active_count}[/bold green] │ "
+                f"⚡ [magenta]Updated:[/magenta] [yellow]{current_time}[/yellow]   │\n"
+                "└─────────────────────────────────────────────────────────────┘"
             )
 
-            # Show success message
+            # Show success message with enhanced formatting
             inactive_count = rows_added - active_count
             details_widget.update(
-                f"✅ [bold green]Successfully loaded {rows_added} agent(s)[/bold green]\n\n"
-                f"[cyan]Agent Summary:[/cyan]\n"
-                f"• Total: [yellow]{rows_added}[/yellow]\n"
-                f"• Active (with endpoint): [green]{active_count}[/green]\n"
-                f"• Inactive: [yellow]{inactive_count}[/yellow]\n\n"
-                f"[dim italic]💡 Click on any agent in the table to view detailed information[/dim]"
+                "┌─────────────────────────────────────────────────┐\n"
+                f"│ ✅ [bold green]LOADED {rows_added} AGENT(S)[/bold green]             │\n"
+                "│                                                 │\n"
+                "│ [cyan]Agent Summary:[/cyan]                            │\n"
+                f"│ • Total:    [bold yellow]{rows_added:3d}[/bold yellow]                     │\n"
+                f"│ • Active:   [bold green]{active_count:3d}[/bold green]                     │\n"
+                f"│ • Inactive: [yellow]{inactive_count:3d}[/yellow]                     │\n"
+                "│                                                 │\n"
+                "│ [dim]💡 Click an agent for details[/dim]             │\n"
+                "└─────────────────────────────────────────────────┘"
             )
 
         except Exception as e:
