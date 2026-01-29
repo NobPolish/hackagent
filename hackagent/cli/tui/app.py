@@ -371,38 +371,58 @@ class HackAgentTUI(App):
             timeout=15,
         )
 
-    def show_success(self, message: str) -> None:
-        """Show success notification with checkmark and animation."""
+    def show_success(self, message: str, title: str = "Success") -> None:
+        """Show success notification with checkmark and animation.
+        
+        Args:
+            message: Message to display
+            title: Optional title for the notification (default: "Success")
+        """
         self.notify(
             f"✅ {message}",
-            title="Success",
+            title=title,
             severity="information",
             timeout=3,
         )
 
-    def show_error(self, message: str) -> None:
-        """Show error notification with X mark and animation."""
+    def show_error(self, message: str, title: str = "Error") -> None:
+        """Show error notification with X mark and animation.
+        
+        Args:
+            message: Message to display
+            title: Optional title for the notification (default: "Error")
+        """
         self.notify(
             f"❌ {message}",
-            title="Error",
+            title=title,
             severity="error",
             timeout=5,
         )
 
-    def show_warning(self, message: str) -> None:
-        """Show warning notification with warning sign and animation."""
+    def show_warning(self, message: str, title: str = "Warning") -> None:
+        """Show warning notification with warning sign and animation.
+        
+        Args:
+            message: Message to display
+            title: Optional title for the notification (default: "Warning")
+        """
         self.notify(
             f"⚠️ {message}",
-            title="Warning",
+            title=title,
             severity="warning",
             timeout=4,
         )
 
-    def show_info(self, message: str) -> None:
-        """Show info notification with info icon and animation."""
+    def show_info(self, message: str, title: str = "Information") -> None:
+        """Show info notification with info icon and animation.
+        
+        Args:
+            message: Message to display
+            title: Optional title for the notification (default: "Information")
+        """
         self.notify(
             f"ℹ️ {message}",
-            title="Information",
+            title=title,
             severity="information",
             timeout=3,
         )

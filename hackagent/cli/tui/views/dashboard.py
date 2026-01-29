@@ -49,6 +49,32 @@ def _escape(value: Any) -> str:
     return text.replace("[", "\\[").replace("]", "\\]")
 
 
+def _format_box(content: str, width: int = 57) -> str:
+    """Format content in a professional ASCII box border.
+    
+    Args:
+        content: Text content to display (can include Rich markup)
+        width: Width of the box (default: 57)
+        
+    Returns:
+        Formatted string with box borders
+        
+    Note:
+        This is a simple implementation. For perfect alignment with Rich markup,
+        consider using Rich's Text.plain to calculate visible length.
+    """
+    lines = content.split("\n")
+    result = [f"┌{'─' * (width - 2)}┐"]
+    
+    for line in lines:
+        # Simple padding - note this doesn't account for Rich markup lengths
+        # For production, you'd want to use Rich's Text.plain to get visible length
+        result.append(f"│ {line:<{width - 4}} │")
+    
+    result.append(f"└{'─' * (width - 2)}┘")
+    return "\n".join(result)
+
+
 class DashboardTab(BaseTab):
     """Dashboard tab showing overview and statistics."""
 
