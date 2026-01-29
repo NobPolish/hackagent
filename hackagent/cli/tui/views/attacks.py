@@ -68,16 +68,51 @@ class AttacksTab(Container):
     DEFAULT_CSS = """
     AttacksTab {
         layout: horizontal;
+        background: #0f0f0f;
     }
 
     AttacksTab #attack-form-container {
         width: 30%;
-        border-right: solid $primary;
+        border-right: heavy #ff0000;
         padding: 1 2;
+        background: linear-gradient(135deg, #151515 0%, #1a0a0a 100%);
     }
 
     AttacksTab #attack-monitor-container {
         width: 70%;
+        background: #0f0f0f;
+    }
+    
+    AttacksTab Input {
+        border: solid #ff3333;
+        background: #1a0000;
+        color: #ffffff;
+    }
+    
+    AttacksTab Input:focus {
+        border: double #ff6666;
+    }
+    
+    AttacksTab Select {
+        border: solid #ff3333;
+        background: #1a0000;
+        color: #ffffff;
+    }
+    
+    AttacksTab TextArea {
+        border: solid #ff3333;
+        background: #1a0000;
+        color: #ffffff;
+    }
+    
+    AttacksTab Label {
+        color: #ff6666;
+        text-style: bold;
+        padding: 1 0;
+    }
+    
+    AttacksTab Button {
+        margin: 1 0;
     }
     """
 
@@ -98,19 +133,23 @@ class AttacksTab(Container):
         self.initial_data = initial_data or {}
 
     def compose(self) -> ComposeResult:
-        """Compose the attacks layout."""
+        """Compose the attacks layout with enhanced visuals."""
         # Split layout: Left side for form, Right side for logs
         with Horizontal():
             # Left side: Attack configuration form
             with VerticalScroll(id="attack-form-container"):
-                yield Static("[bold cyan]Attack Configuration[/bold cyan]")
+                yield Static(
+                    "╔════════════════════════════════╗\n"
+                    "║  ⚔️ [bold cyan reverse] ATTACK CONFIG [/] ⚔️  ║\n"
+                    "╚════════════════════════════════╝"
+                )
                 yield Static("")  # Spacing
 
-                yield Label("Agent Name:")
+                yield Label("🤖 Agent Name:")
                 yield Input(placeholder="e.g., weather-bot", id="agent-name")
                 yield Static("")  # Spacing
 
-                yield Label("Agent Type:")
+                yield Label("🔧 Agent Type:")
                 yield Select(
                     [
                         ("Google ADK", "google-adk"),
@@ -126,13 +165,13 @@ class AttacksTab(Container):
                 )
                 yield Static("")  # Spacing
 
-                yield Label("Endpoint URL:")
+                yield Label("🌐 Endpoint URL:")
                 yield Input(
                     placeholder="e.g., http://localhost:8000", id="endpoint-url"
                 )
                 yield Static("")  # Spacing
 
-                yield Label("Attack Strategy:")
+                yield Label("🎯 Attack Strategy:")
                 yield Select(
                     [("AdvPrefix", "advprefix")],
                     id="attack-strategy",
@@ -140,26 +179,28 @@ class AttacksTab(Container):
                 )
                 yield Static("")  # Spacing
 
-                yield Label("Goals (what you want the agent to do incorrectly):")
+                yield Label("🎲 Goals (attack objectives):")
                 goals_area = TextArea("Return fake weather data", id="attack-goals")
                 goals_area.styles.height = 6
                 yield goals_area
                 yield Static("")  # Spacing
 
-                yield Label("Timeout (seconds):")
+                yield Label("⏱️ Timeout (seconds):")
                 yield Input(value="300", id="timeout")
                 yield Static("")  # Spacing
                 yield Static("")  # Extra spacing before buttons
 
-                yield Button("Execute Attack", id="execute-attack", variant="primary")
-                yield Button("Dry Run", id="dry-run", variant="default")
-                yield Button("Clear", id="clear-form", variant="error")
+                yield Button("⚔️ Execute Attack", id="execute-attack", variant="primary")
+                yield Button("🧪 Dry Run", id="dry-run", variant="default")
+                yield Button("🔄 Clear Form", id="clear-form", variant="error")
 
                 yield Static("")  # Spacing
                 yield Static("")  # Extra spacing after buttons
 
                 yield Static(
-                    "[dim]Configure attack parameters and click Execute[/dim]",
+                    "┌─────────────────────────────────┐\n"
+                    "│ [dim]⚙️ Configure & Execute[/dim]     │\n"
+                    "└─────────────────────────────────┘",
                     id="execution-status",
                 )
                 yield ProgressBar(total=100, show_eta=True, id="attack-progress")
@@ -169,14 +210,14 @@ class AttacksTab(Container):
                 with TabbedContent():
                     with TabPane("📋 Logs", id="logs-tab"):
                         yield AttackLogViewer(
-                            title="Attack Execution Logs",
+                            title="⚡ Attack Execution Logs",
                             show_controls=True,
                             max_lines=1000,
                             id="attack-log-viewer",
                         )
                     with TabPane("🔧 Actions", id="actions-tab"):
                         yield AgentActionsViewer(
-                            title="Agent Actions Inspector",
+                            title="🔍 Agent Actions Inspector",
                             show_controls=True,
                             id="attack-actions-viewer",
                         )
