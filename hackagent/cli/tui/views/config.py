@@ -29,7 +29,58 @@ from hackagent.cli.config import CLIConfig
 class ConfigTab(VerticalScroll):
     """Config tab for managing settings with vertical scrolling."""
 
-    DEFAULT_CSS = ""
+    DEFAULT_CSS = """
+    ConfigTab {
+        background: #0f0f0f;
+        padding: 1 2;
+    }
+    
+    ConfigTab .config-section {
+        border: round #ff3333;
+        background: linear-gradient(135deg, #151515 0%, #1a0a0a 100%);
+        padding: 1 2;
+        margin: 1 0;
+    }
+    
+    ConfigTab .form-group {
+        margin: 1 0;
+        padding: 1;
+        background: #0a0a0a;
+        border: solid #5b0000;
+    }
+    
+    ConfigTab Input {
+        border: solid #ff3333;
+        background: #1a0000;
+        color: #ffffff;
+    }
+    
+    ConfigTab Input:focus {
+        border: double #ff6666;
+    }
+    
+    ConfigTab Select {
+        border: solid #ff3333;
+        background: #1a0000;
+    }
+    
+    ConfigTab Label {
+        color: #ff6666;
+        text-style: bold;
+        padding: 1 0;
+    }
+    
+    ConfigTab .info-box {
+        background: linear-gradient(135deg, #1a0000 0%, #0f0f0f 100%);
+        border: solid #ff3333;
+        padding: 1;
+        margin: 1 0;
+    }
+    
+    ConfigTab .button-group {
+        margin: 2 0;
+    }
+    """
 
     BINDINGS = [
         Binding("s", "save_config", "Save"),
@@ -47,17 +98,19 @@ class ConfigTab(VerticalScroll):
         self.cli_config = cli_config
 
     def compose(self) -> ComposeResult:
-        """Compose the config layout."""
+        """Compose the config layout with enhanced visuals."""
         yield Static(
-            "[bold cyan]HackAgent Configuration[/bold cyan]",
+            "╔═══════════════════════════════════════════════════════════════╗\n"
+            "║      ⚙️ [bold cyan reverse] CONFIGURATION CENTER [/]      ║\n"
+            "╚═══════════════════════════════════════════════════════════════╝",
             classes="config-section",
         )
 
         with Vertical(classes="config-section"):
-            yield Static("[bold]API Configuration[/bold]")
+            yield Static("[bold yellow]🔑 API Configuration[/bold yellow]")
 
             with Vertical(classes="form-group"):
-                yield Label("API Key:")
+                yield Label("🔐 API Key:")
                 yield Input(
                     placeholder="Your HackAgent API key",
                     id="api-key",
@@ -65,7 +118,7 @@ class ConfigTab(VerticalScroll):
                 )
 
             with Vertical(classes="form-group"):
-                yield Label("Base URL:")
+                yield Label("🌐 Base URL:")
                 yield Input(
                     id="base_url",
                     placeholder="https://api.hackagent.dev",
@@ -73,7 +126,7 @@ class ConfigTab(VerticalScroll):
                 )
 
             with Vertical(classes="form-group"):
-                yield Label("Output Format:")
+                yield Label("📊 Output Format:")
                 yield Select(
                     [("Table", "table"), ("JSON", "json"), ("CSV", "csv")],
                     id="output-format",
@@ -81,23 +134,28 @@ class ConfigTab(VerticalScroll):
                 )
 
         with Vertical(classes="config-section"):
-            yield Static("[bold]Configuration File[/bold]")
+            yield Static("[bold yellow]📁 Configuration File[/bold yellow]")
 
             yield Static(
-                f"[dim]Location:[/dim] {self.cli_config.default_config_path}",
+                f"┌─────────────────────────────────────────────────┐\n"
+                f"│ [dim]Location:[/dim]                                  │\n"
+                f"│ [cyan]{str(self.cli_config.default_config_path)[:45]}[/cyan]│\n"
+                f"└─────────────────────────────────────────────────┘",
                 classes="info-box",
                 id="config-file-location",
             )
 
             yield Static(
-                "[dim]Status: Checking...[/dim]",
+                "┌─────────────────────────────────────────────────┐\n"
+                "│ [dim]⏳ Status: Checking...[/dim]                   │\n"
+                "└─────────────────────────────────────────────────┘",
                 classes="status-indicator",
                 id="config-status",
             )
 
         with Horizontal(classes="button-group"):
-            yield Button("Save Configuration", id="save-config", variant="primary")
-            yield Button("Test Connection", id="test-connection", variant="default")
+            yield Button("💾 Save Configuration", id="save-config", variant="primary")
+            yield Button("🔍 Test Connection", id="test-connection", variant="default")
             yield Button("Reset to Defaults", id="reset-config", variant="error")
             yield Button("Validate Config", id="validate-config", variant="success")
 
@@ -145,10 +203,17 @@ class ConfigTab(VerticalScroll):
         status_widget = self.query_one("#config-status", Static)
 
         if self.cli_config.default_config_path.exists():
-            status_widget.update("[green]✅ Configuration file exists[/green]")
+            status_widget.update(
+                "┌─────────────────────────────────────────────────┐\n"
+                "│ [green]✅ Status: Configuration file exists[/green]  │\n"
+                "└─────────────────────────────────────────────────┘"
+            )
         else:
             status_widget.update(
-                "[yellow]⚠️ No configuration file found. Save to create one.[/yellow]"
+                "┌─────────────────────────────────────────────────┐\n"
+                "│ [yellow]⚠️ Status: No config file found[/yellow]        │\n"
+                "│ [dim]Save to create configuration[/dim]              │\n"
+                "└─────────────────────────────────────────────────┘"
             )
 
     def _save_config(self) -> None:

@@ -28,6 +28,7 @@ from hackagent.cli.config import CLIConfig
 from hackagent.cli.tui.views.agents import AgentsTab
 from hackagent.cli.tui.views.attacks import AttacksTab
 from hackagent.cli.tui.views.config import ConfigTab
+from hackagent.cli.tui.views.dashboard import DashboardTab
 from hackagent.cli.tui.views.results import ResultsTab
 
 
@@ -35,161 +36,259 @@ class HackAgentTUI(App):
     """HackAgent Terminal User Interface Application"""
 
     CSS = """
+    /* Modern dark theme with enhanced visuals */
     Screen {
-        background: $surface;
+        background: #0a0a0a;
+        transition: background 300ms;
     }
 
     Header {
-        background: #8b0000;  /* dark red - HackAgent brand color */
+        background: linear-gradient(90deg, #1a0000 0%, #8b0000 50%, #1a0000 100%);
         color: #ffffff;
         height: 3;
+        text-style: bold;
+        border-bottom: heavy #ff0000;
     }
 
     Footer {
-        background: #2b0000;  /* darker red */
-        color: #ffffff;
+        background: linear-gradient(90deg, #0a0a0a 0%, #2b0000 50%, #0a0a0a 100%);
+        color: #cccccc;
+        border-top: heavy #5b0000;
     }
 
     TabbedContent {
         height: 100%;
-        border: solid #ff0000;  /* red - HackAgent brand color */
+        border: heavy #ff0000;
+        background: #0f0f0f;
     }
 
     TabPane {
         padding: 1 2;
+        background: #0f0f0f;
     }
 
     TabbedContent > ContentSwitcher > * > * {
-        background: $surface;
+        background: #0f0f0f;
     }
 
     Tabs {
-        background: #2b0000;
+        background: linear-gradient(180deg, #1a0000 0%, #0a0a0a 100%);
+        border-bottom: wide #ff0000;
     }
 
     Tab {
-        color: #cccccc;
-        background: #2b0000;
+        color: #888888;
+        background: transparent;
+        text-style: normal;
+        padding: 1 3;
+        transition: all 150ms;
     }
 
     Tab.-active {
-        color: #ffffff;
-        background: #8b0000;  /* dark red when active */
+        color: #ff3333;
+        background: linear-gradient(180deg, #2b0000 0%, #1a0000 100%);
         text-style: bold;
+        border-bottom: wide #ff0000;
     }
 
     Tab:hover {
-        background: #5b0000;
+        background: #1a0000;
+        color: #ff6666;
     }
 
     .title-bar {
         dock: top;
         width: 100%;
-        background: #8b0000;
+        background: linear-gradient(90deg, #1a0000 0%, #8b0000 50%, #1a0000 100%);
         color: #ffffff;
         height: 3;
         content-align: center middle;
+        border: round #ff0000;
+        text-style: bold;
     }
 
     .section {
-        border: solid #ff0000;
-        padding: 1;
+        border: round #ff3333;
+        padding: 1 2;
         margin: 1;
         height: auto;
+        background: #151515;
     }
 
     .info-box {
-        background: $panel;
-        border: solid #ff0000;
-        padding: 1;
+        background: linear-gradient(135deg, #151515 0%, #1a0a0a 100%);
+        border: round #ff3333;
+        padding: 1 2;
         margin: 1;
     }
 
     Button {
         margin: 1;
+        border: solid #ff0000;
+        background: #1a0000;
+        color: #ffffff;
+        transition: all 150ms;
+    }
+
+    Button:hover {
+        background: #2b0000;
+        border: solid #ff3333;
+        text-style: bold;
     }
 
     Button.-primary {
-        background: #8b0000;
+        background: linear-gradient(135deg, #8b0000 0%, #ff0000 100%);
         color: #ffffff;
+        border: solid #ff3333;
+        text-style: bold;
     }
 
     Button.-primary:hover {
-        background: #ff0000;
+        background: linear-gradient(135deg, #ff0000 0%, #ff3333 100%);
+        border: double #ff6666;
+    }
+
+    Button:focus {
+        border: double #ff6666;
     }
 
     DataTable {
         height: 100%;
+        background: #0f0f0f;
+        border: solid #ff0000;
     }
 
     DataTable > .datatable--header {
-        background: #8b0000;
+        background: linear-gradient(180deg, #8b0000 0%, #5b0000 100%);
         color: #ffffff;
         text-style: bold;
+        border-bottom: wide #ff0000;
     }
 
     DataTable > .datatable--cursor {
-        background: #5b0000;
+        background: linear-gradient(90deg, #2b0000 0%, #5b0000 100%);
+        color: #ffffff;
+    }
+
+    DataTable > .datatable--cursor:hover {
+        background: linear-gradient(90deg, #5b0000 0%, #8b0000 100%);
+    }
+
+    /* Enhanced stat cards with glow effect */
+    .stat-card {
+        border: round #ff3333;
+        background: linear-gradient(135deg, #1a0000 0%, #0f0f0f 100%);
+        padding: 1 2;
+        margin: 1;
+        height: 5;
     }
 
     /* Results tab specific styles - horizontal split 20-80 */
     ResultsTab #results-left-panel {
-        border-right: solid #ff0000;
-        background: $panel;
+        border-right: heavy #ff0000;
+        background: #0f0f0f;
     }
 
     ResultsTab #results-right-panel {
-        background: $panel;
+        background: #0f0f0f;
     }
 
     ResultsTab #results-title {
         height: 3;
         width: 100%;
         text-align: center;
-        background: #8b0000;
+        background: linear-gradient(90deg, #1a0000 0%, #8b0000 50%, #1a0000 100%);
         color: #ffffff;
         padding: 1;
+        border: round #ff0000;
+        text-style: bold;
     }
 
     ResultsTab #details-title {
         height: 3;
         width: 100%;
         text-align: center;
-        background: #8b0000;
+        background: linear-gradient(90deg, #1a0000 0%, #8b0000 50%, #1a0000 100%);
         color: #ffffff;
         padding: 1;
+        border: round #ff0000;
+        text-style: bold;
     }
 
     ResultsTab .toolbar {
         height: 3;
         width: 100%;
         padding: 0 1;
+        background: #151515;
+        border: solid #5b0000;
+    }
+
+    /* Loading and progress indicators */
+    LoadingIndicator {
+        color: #ff0000;
+        text-style: bold;
+    }
+
+    ProgressBar {
+        bar-color: #ff0000;
+        background: #1a0000;
+    }
+
+    /* Notification styles */
+    .notification {
+        background: linear-gradient(135deg, #1a0000 0%, #0f0f0f 100%);
+        border: round #ff3333;
+        padding: 1 2;
+        margin: 1;
+    }
+
+    .success-notification {
+        border: round #00ff00;
+    }
+
+    .error-notification {
+        border: round #ff0000;
+    }
+
+    .warning-notification {
+        border: round #ffaa00;
+    }
+
+    /* Smooth animations for containers */
+    Container {
+        transition: offset 200ms, opacity 200ms;
+    }
+
+    Static {
+        transition: opacity 150ms;
     }
     """
 
-    TITLE = "🔴 HACKAGENT 🔴 - AI Security Testing Toolkit"
-    SUB_TITLE = "Red Team Security Interface"
+    TITLE = "⚡ HACKAGENT ⚡ - Elite AI Security Platform"
+    SUB_TITLE = "🔐 Zero-Code AI-Native Security Operations Center 🔐"
 
     BINDINGS = [
         Binding("q", "quit", "Quit", priority=True),
+        Binding("d", "switch_tab('dashboard')", "Dashboard", show=False),
         Binding("a", "switch_tab('agents')", "Agents", show=False),
         Binding("k", "switch_tab('attacks')", "Attacks", show=False),
         Binding("r", "switch_tab('results')", "Results", show=False),
         Binding("c", "switch_tab('config')", "Config", show=False),
         Binding("f5", "refresh", "Refresh", show=True),
+        Binding("?", "show_help", "Help", show=True),
     ]
 
     def __init__(
         self,
         cli_config: CLIConfig,
-        initial_tab: str = "agents",
+        initial_tab: str = "dashboard",
         initial_data: dict[Any, Any] | None = None,
     ):
         """Initialize the TUI application.
 
         Args:
             cli_config: CLI configuration object
-            initial_tab: Which tab to show initially (default: "agents")
+            initial_tab: Which tab to show initially (default: "dashboard")
             initial_data: Initial data to pre-fill in the tab (default: None)
         """
         super().__init__()
@@ -201,16 +300,19 @@ class HackAgentTUI(App):
     def compose(self) -> ComposeResult:
         """Compose the UI layout."""
         with TabbedContent(initial=self.initial_tab):
-            with TabPane("Agents", id="agents"):
+            with TabPane("🏠 Dashboard", id="dashboard"):
+                yield DashboardTab(self.cli_config)
+
+            with TabPane("🤖 Agents", id="agents"):
                 yield AgentsTab(self.cli_config)
 
-            with TabPane("Attacks", id="attacks"):
+            with TabPane("⚔️ Attacks", id="attacks"):
                 yield AttacksTab(self.cli_config, initial_data=self.initial_data)
 
-            with TabPane("Results", id="results"):
+            with TabPane("📊 Results", id="results"):
                 yield ResultsTab(self.cli_config)
 
-            with TabPane("Config", id="config"):
+            with TabPane("⚙️ Config", id="config"):
                 yield ConfigTab(self.cli_config)
 
         yield Footer()
@@ -239,19 +341,88 @@ class HackAgentTUI(App):
         """Called when the app is mounted."""
         self.title = self.TITLE
         self.sub_title = self.SUB_TITLE
+        
+        # Show welcome notification
+        self.show_info("Welcome to HackAgent! Press ? for keyboard shortcuts")
 
-    def show_success(self, message: str) -> None:
-        """Show success notification with checkmark."""
-        pass
+    def action_show_help(self) -> None:
+        """Show keyboard shortcuts help screen."""
+        help_text = (
+            "═══ ⚡ KEYBOARD SHORTCUTS ═══\n\n"
+            "[bold cyan]Navigation:[/bold cyan]\n"
+            "  [bold]d[/bold] - Dashboard (Overview & Stats)\n"
+            "  [bold]a[/bold] - Agents (Manage AI Agents)\n"
+            "  [bold]k[/bold] - Attacks (Security Testing)\n"
+            "  [bold]r[/bold] - Results (View Test Results)\n"
+            "  [bold]c[/bold] - Config (Settings)\n\n"
+            "[bold yellow]Actions:[/bold yellow]\n"
+            "  [bold]F5[/bold] - Refresh current tab\n"
+            "  [bold]Tab[/bold] - Navigate between elements\n"
+            "  [bold]Enter[/bold] - Select/Activate\n"
+            "  [bold]Esc[/bold] - Cancel/Back\n\n"
+            "[bold red]System:[/bold red]\n"
+            "  [bold]?[/bold] - Show this help\n"
+            "  [bold]q[/bold] - Quit application\n\n"
+            "[dim]Press any key to close this help screen[/dim]"
+        )
+        self.notify(
+            help_text,
+            title="⌨️ Keyboard Shortcuts",
+            timeout=15,
+        )
 
-    def show_error(self, message: str) -> None:
-        """Show error notification with X mark."""
-        pass
+    def show_success(self, message: str, title: str = "Success") -> None:
+        """Show success notification with checkmark and animation.
+        
+        Args:
+            message: Message to display
+            title: Optional title for the notification (default: "Success")
+        """
+        self.notify(
+            f"✅ {message}",
+            title=title,
+            severity="information",
+            timeout=3,
+        )
 
-    def show_warning(self, message: str) -> None:
-        """Show warning notification with warning sign."""
-        pass
+    def show_error(self, message: str, title: str = "Error") -> None:
+        """Show error notification with X mark and animation.
+        
+        Args:
+            message: Message to display
+            title: Optional title for the notification (default: "Error")
+        """
+        self.notify(
+            f"❌ {message}",
+            title=title,
+            severity="error",
+            timeout=5,
+        )
 
-    def show_info(self, message: str) -> None:
-        """Show info notification with info icon."""
-        pass
+    def show_warning(self, message: str, title: str = "Warning") -> None:
+        """Show warning notification with warning sign and animation.
+        
+        Args:
+            message: Message to display
+            title: Optional title for the notification (default: "Warning")
+        """
+        self.notify(
+            f"⚠️ {message}",
+            title=title,
+            severity="warning",
+            timeout=4,
+        )
+
+    def show_info(self, message: str, title: str = "Information") -> None:
+        """Show info notification with info icon and animation.
+        
+        Args:
+            message: Message to display
+            title: Optional title for the notification (default: "Information")
+        """
+        self.notify(
+            f"ℹ️ {message}",
+            title=title,
+            severity="information",
+            timeout=3,
+        )
